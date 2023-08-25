@@ -1,0 +1,105 @@
+hashfunction h;
+
+const xor:Function;
+
+const cat:Function;
+
+protocol mbs(DV , CS)
+
+{
+
+	role DV
+
+	{
+
+		fresh rs1:Nonce;
+
+		const  TCDVi,RIDDVi,TIDDVin,RIDCSj,TCCSj,T1, T2, T3, rs1, rs2;
+
+		var rs2: Nonce;
+
+		macro M1= xor(h(cat (rs1,TCDVi)), h(cat (RIDDVi,T1)));
+
+		macro M2= h(cat(h(cat(rs1,TCDVi)),RIDDVi,T1));
+
+		macro SKDViCSj= h(cat(h(cat(rs1,TCDVi), h(cat(rs2,RIDCSj,TCCSj)), RIDDVi,T1,T2)));
+
+		macro skv = h(cat(SKDViCSj,T3));
+
+		send_1(DV, CS, cat(M1,M2,T1));
+
+
+
+		recv_2(CS, DV, cat(xor(h(cat (rs2,TCCSj,RIDCSj)), h(cat (RIDDVi,T2))),h(cat(h(cat(h(cat(rs1,TCDVi), h(cat(rs2,RIDCSj,TCCSj)), RIDDVi,T1,T2))),T1,T2)),xor(TIDDVin,h(cat(RIDDVi,h(cat(rs2,RIDCSj)),T2))),T2));
+
+
+
+		send_3(DV,CS, cat(skv,T3));
+
+
+
+		claim_DV1(DV, Secret, (rs1));
+
+		claim_DV2(DV,Secret,(RIDDVi));
+
+		claim_DV3(DV,Secret,(TCDVi));
+
+		claim_DV4(DV,Niagree);
+
+		claim_DV5(DV,Nisynch);
+
+		claim_DV6(DV, Secret,(SKDViCSj));
+
+		claim_DV7(DV,Weakagree);
+
+		claim_DV8(DV,Alive);
+
+	}
+
+	role CS
+
+	{
+
+		fresh rs2:Nonce;
+
+		const TCCSj,RIDCSj,TCDVi,RIDDVi,TIDDVin,T1,T2,T3, rs1, rs2;
+
+		var rs1: Nonce;
+
+		macro M3= xor(h(cat (rs2,TCCSj,RIDCSj)), h(cat (RIDDVi,T2)));
+
+		macro SKCSjDVi= h(cat(h(cat(rs1,TCDVi), h(cat(rs2,RIDCSj,TCCSj)), RIDDVi,T1,T2)));
+
+		macro M4= h(cat(SKCSjDVi,T1,T2));
+
+		macro M5= xor(TIDDVin,h(cat(RIDDVi,h(cat(rs2,RIDCSj)),T2)));
+
+		
+
+		recv_1(DV,CS,cat(xor(h(cat (rs1,TCDVi)), h(cat (RIDDVi,T1))), h(cat(h(cat(rs1,TCDVi)),RIDDVi,T1)),T1));
+
+		send_2(CS,DV,cat(M3,M4,M5,T2));
+
+
+
+		recv_3(DV,CS,cat(h(cat(SKDViCSj,T3)),T3));
+
+		claim_CS1(CS,Secret,(rs2));
+
+		claim_CS2(CS,Secret,(RIDCSj));
+
+		claim_CS3(CS,Secret,(TCCSj));
+
+		claim_CS4(CS,Niagree);
+
+		claim_CS5(CS,Nisynch);
+
+		claim_CS6(CS,Secret,(SKCSjDVi));
+
+		claim_CS7(CS,Weakagree);
+
+		claim_CS8(CS,Alive);
+
+	}
+
+}
